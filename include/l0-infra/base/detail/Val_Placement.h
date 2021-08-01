@@ -10,9 +10,9 @@
 #include <new>
 
 template<typename T>
-struct Value_Placement {
-    Value_Placement() = default;
-    ~Value_Placement() = default;
+struct Val_Placement {
+    Val_Placement() = default;
+    ~Val_Placement() = default;
 
     template<typename ... ARGS>
     auto Emplace(ARGS&& ... args) -> T* {
@@ -25,6 +25,16 @@ struct Value_Placement {
         } else {
             return GetObj();
         }
+    }
+
+    auto operator=(Val_Placement const& rhs) -> Val_Placement& {
+        Emplace(rhs.GetRef());
+        return *this;
+    }
+
+    auto operator=(Val_Placement&& rhs) -> Val_Placement& {
+        Emplace(std::move(rhs.GetRef()));
+        return *this;
     }
 
     auto Destroy() -> void {
@@ -76,4 +86,4 @@ private:
     typename detail::StorageTrait<T>::Type storage;
 };
 
-#endif //OBJECT_ARRAY_PLACEMENT_H
+#endif //PLACEMENT_DECEC01733DA4EE6825B4A610EBE5D47

@@ -2,8 +2,8 @@
 // Created by Darwin Yuan on 2021/8/1.
 //
 
-#ifndef MAYBE_C5A827A5E70E4D0396C1AC85D28DFC41
-#define MAYBE_C5A827A5E70E4D0396C1AC85D28DFC41
+#ifndef PLACEMENT_C5A827A5E70E4D0396C1AC85D28DFC41
+#define PLACEMENT_C5A827A5E70E4D0396C1AC85D28DFC41
 
 template<typename T>
 struct Ref_Placement {
@@ -13,6 +13,11 @@ struct Ref_Placement {
     auto Emplace(T& v) -> T* {
         new (&ref) RefHolder{v};
         return &v;
+    }
+
+    auto operator=(Ref_Placement const& rhs) -> Ref_Placement& {
+        Emplace(rhs.ref.ref);
+        return *this;
     }
 
     auto Destroy() -> void {}
@@ -64,4 +69,4 @@ private:
     };
 };
 
-#endif //MAYBE_C5A827A5E70E4D0396C1AC85D28DFC41
+#endif //PLACEMENT_C5A827A5E70E4D0396C1AC85D28DFC41
