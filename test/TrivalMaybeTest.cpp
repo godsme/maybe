@@ -10,6 +10,7 @@ SCENARIO("Default Maybe Test") {
     static_assert(!std::is_trivially_copyable_v<Maybe<int>>);
     REQUIRE(!maybe.Present());
     REQUIRE(maybe == nothing);
+    REQUIRE(maybe == Maybe<int>{});
 }
 
 SCENARIO("Nothing Test") {
@@ -37,6 +38,7 @@ SCENARIO("cons by another Maybe Test") {
     REQUIRE(maybe.Present());
     REQUIRE(maybe != nothing);
     REQUIRE(*maybe == 10);
+    REQUIRE(maybe == maybe1);
 }
 
 SCENARIO("copy assignment by another Maybe Test") {
@@ -45,4 +47,6 @@ SCENARIO("copy assignment by another Maybe Test") {
     maybe = maybe1;
     REQUIRE(!maybe.Present());
     REQUIRE(maybe == nothing);
+
+    REQUIRE(maybe == maybe1);
 }

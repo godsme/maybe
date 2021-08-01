@@ -5,14 +5,18 @@
 #include <catch.hpp>
 
 namespace {
-    bool destructed = false;
+    int constructed = 0;
     struct Foo {
         Foo(int a, int b) : a{a}, b{b} {
-            destructed = false;
+            constructed++;
+        }
+
+        Foo(Foo const& rhs) : a{rhs.a}, b{rhs.b} {
+            constructed++;
         }
 
         ~Foo() {
-            destructed = true;
+            constructed--;
         }
         int a;
         int b;
@@ -44,7 +48,7 @@ SCENARIO("Foo cons by Nothing Test") {
         REQUIRE(maybe == nothing);
     }
 
-    REQUIRE(!destructed);
+    REQUIRE(constructed == 0);
 }
 
 SCENARIO("Foo cons by value Maybe Test") {
@@ -55,5 +59,40 @@ SCENARIO("Foo cons by value Maybe Test") {
         REQUIRE(*maybe == Foo{10, 20});
     }
 
-    REQUIRE(destructed);
+    REQUIRE(constructed == 0);
+}
+
+SCENARIO("Foo cons by another Maybe Test") {
+    REQUIRE(constructed == 0);
+    {
+        Maybe<Foo> maybe1{10, 20};
+        Maybe<Foo> maybe{maybe1};
+
+        REQUIRE(constructed == 2);
+
+        REQUIRE(maybe.Present());
+        REQUIRE(maybe != nothing);
+        REQUIRE(*maybe == Foo{10, 20});
+        REQUIRE(maybe == maybe1);
+    }
+
+    REQUIRE(constructed == 0);
+}
+
+SCENARIO("Foo copy assignment by another Maybe Test") {
+    {
+        Maybe<Foo> maybe1;
+        REQUIRE(constructed == 0);
+        Maybe<Foo> maybe{10, 20};
+        REQUIRE(maybe != maybe1);
+        REQUIRE(constructed == 1);
+        maybe = maybe1;
+        REQUIRE(constructed == 0);
+        REQUIRE(!maybe.Present());
+        REQUIRE(maybe == nothing);
+
+        REQUIRE(maybe == maybe1);
+    }
+
+    REQUIRE(constructed == 0);
 }

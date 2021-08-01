@@ -75,6 +75,18 @@ namespace detail {
             return !lhs.present;
         }
 
+        friend constexpr auto operator==(Maybe const& lhs, Maybe const& rhs) -> bool {
+            if(lhs.present) {
+                return rhs.present ? *lhs.value == *rhs.value : false;
+            } else {
+                return !rhs.present;
+            }
+        }
+
+        friend constexpr auto operator!=(Maybe const& lhs, Maybe const& rhs) -> bool {
+            return !operator==(lhs, rhs);
+        }
+
         friend constexpr auto operator==(Nothing, Maybe const& rhs) -> bool {
             return !rhs.present;
         }
