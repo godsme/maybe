@@ -1,6 +1,7 @@
 //
-// Created by Darwin Yuan on 2021/8/1.
+// Created by Darwin Yuan on 2021/8/2.
 //
+
 #include <l0-infra/maybe/Maybe.h>
 #include <catch.hpp>
 
@@ -30,55 +31,44 @@ namespace {
     static_assert(!std::is_copy_constructible_v<Foo>);
 }
 
-SCENARIO("Foo Default Maybe Test") {
-    Maybe<Foo> maybe;
-    static_assert(!std::is_trivially_destructible_v<Maybe<Foo>>);
-    static_assert(!std::is_trivially_copyable_v<Maybe<Foo>>);
+SCENARIO("Ref Maybe Test") {
+    Maybe<Foo&> maybe;
+    static_assert(std::is_trivially_destructible_v<Maybe<Foo&>>);
+    static_assert(!std::is_trivially_copyable_v<Maybe<Foo&>>);
     REQUIRE(!maybe.Present());
-    REQUIRE(!maybe);
     REQUIRE(maybe == nothing);
-    Foo defaultValue{10, 20};
-    auto& result = maybe.ValueOr(defaultValue);
-    REQUIRE(result == Foo{10, 20});
+    REQUIRE(maybe == Maybe<Foo&>{});
 }
 
-SCENARIO("Foo Nothing Test") {
-    Maybe<Foo> maybe = nothing;
+SCENARIO("Ref Nothing Test") {
+    Maybe<Foo&> maybe = nothing;
     REQUIRE(!maybe.Present());
-    REQUIRE(!maybe);
     REQUIRE(maybe == nothing);
 }
 
-SCENARIO("Foo cons by Nothing Test") {
-    {
-        Maybe<Foo> maybe{nothing};
-        REQUIRE(!maybe.Present());
-        REQUIRE(!maybe);
-        REQUIRE(maybe == nothing);
-    }
-
-    REQUIRE(constructed == 0);
+SCENARIO("Ref cons by Nothing Test") {
+    Maybe<Foo&> maybe{nothing};
+    REQUIRE(!maybe.Present());
+    REQUIRE(maybe == nothing);
 }
 
-SCENARIO("Foo cons by value Maybe Test") {
-    {
-        Maybe<Foo> maybe{10, 20};
-        REQUIRE(maybe.Present());
-        REQUIRE(maybe);
-        REQUIRE(maybe != nothing);
-        REQUIRE(*maybe == Foo{10, 20});
-    }
-
-    REQUIRE(constructed == 0);
+SCENARIO("Ref cons by value Maybe Test") {
+    Foo a{10, 20};
+    Maybe<Foo&> maybe{a};
+    REQUIRE(maybe.Present());
+    REQUIRE(maybe != nothing);
+    REQUIRE(*maybe == Foo{10, 20});
 }
 
-SCENARIO("Foo cons by another Maybe Test") {
+SCENARIO("Ref Foo cons by another Maybe Test") {
     constructed = 0;
     {
-        Maybe<Foo> maybe1{10, 20};
-        Maybe<Foo> maybe{std::move(maybe1)};
+        Foo a{10, 20};
+        REQUIRE(constructed == 1);
+        Maybe<Foo&> maybe1{a};
+        Maybe<Foo&> maybe{std::move(maybe1)};
 
-        REQUIRE(constructed == 2);
+        REQUIRE(constructed == 1);
 
         REQUIRE(maybe.Present());
         REQUIRE(maybe != nothing);
@@ -88,22 +78,27 @@ SCENARIO("Foo cons by another Maybe Test") {
         Foo defaultValue{20, 30};
         Foo& result = maybe.ValueOr(defaultValue);
         REQUIRE(result == Foo{10, 20});
+
+        maybe.ValueOr(Foo{20, 40});
     }
 
     REQUIRE(constructed == 0);
 }
 
-SCENARIO("Foo copy assignment by another Maybe Test") {
+SCENARIO("Ref Foo copy assignment by another Maybe Test") {
     {
-        Maybe<Foo> maybe1;
+        Maybe<Foo&> maybe1;
         REQUIRE(constructed == 0);
 
-        Maybe<Foo> maybe{10, 20};
+        Foo a{10, 20};
+        REQUIRE(constructed == 1);
+
+        Maybe<Foo&> maybe{a};
         REQUIRE(maybe != maybe1);
         REQUIRE(constructed == 1);
 
         maybe = std::move(maybe1);
-        REQUIRE(constructed == 0);
+        REQUIRE(constructed == 1);
 
         REQUIRE(!maybe.Present());
         REQUIRE(maybe == nothing);

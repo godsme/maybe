@@ -98,8 +98,8 @@ namespace detail {
         }
 
         constexpr auto ValueOr(ValueType&& defaultValue) & -> ValueType {
-            static_assert(std::is_copy_assignable_v<ValueType>);
             static_assert(!std::is_reference_v<T>);
+            static_assert(std::is_copy_assignable_v<ValueType>);
             return present ?  Value() : std::move(defaultValue);
         }
 
