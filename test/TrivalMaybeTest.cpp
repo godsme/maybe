@@ -3,6 +3,7 @@
 //
 #include <l0-infra/maybe/Maybe.h>
 #include <catch.hpp>
+#include <sstream>
 
 SCENARIO("Default Maybe Test") {
     Maybe<int> maybe;
@@ -39,6 +40,24 @@ SCENARIO("cons by another Maybe Test") {
     REQUIRE(maybe != nothing);
     REQUIRE(*maybe == 10);
     REQUIRE(maybe == maybe1);
+
+    auto&& f = [](auto&& elem) -> Maybe<std::string> {
+        if(elem == 20) {
+            return nothing;
+        }
+        std::ostringstream ss;
+        ss << elem;
+        return ss.str();
+    };
+
+    REQUIRE(maybe.Map(f) == Maybe{std::string("10")});
+
+    *maybe = 20;
+    REQUIRE(maybe.Value() == 20);
+
+    REQUIRE(maybe.ValueOr(30) == 20);
+
+    REQUIRE(maybe.Map(f) == nothing);
 }
 
 SCENARIO("copy assignment by another Maybe Test") {
