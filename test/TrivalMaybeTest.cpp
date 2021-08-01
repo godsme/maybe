@@ -10,26 +10,26 @@ SCENARIO("Default Maybe Test") {
     static_assert(std::is_trivially_destructible_v<Maybe<int>>);
     static_assert(!std::is_trivially_copyable_v<Maybe<int>>);
     REQUIRE(!maybe.Present());
-    REQUIRE(maybe == nothing);
+    REQUIRE(maybe == std::nullopt);
     REQUIRE(maybe == Maybe<int>{});
 }
 
 SCENARIO("Nothing Test") {
-    Maybe<int> maybe = nothing;
+    Maybe<int> maybe = std::nullopt;
     REQUIRE(!maybe.Present());
-    REQUIRE(maybe == nothing);
+    REQUIRE(maybe == std::nullopt);
 }
 
 SCENARIO("cons by Nothing Test") {
-    Maybe<int> maybe{nothing};
+    Maybe<int> maybe{std::nullopt};
     REQUIRE(!maybe.Present());
-    REQUIRE(maybe == nothing);
+    REQUIRE(maybe == std::nullopt);
 }
 
 SCENARIO("cons by value Maybe Test") {
     Maybe<int> maybe{10};
     REQUIRE(maybe.Present());
-    REQUIRE(maybe != nothing);
+    REQUIRE(maybe != std::nullopt);
     REQUIRE(*maybe == 10);
 }
 
@@ -37,13 +37,13 @@ SCENARIO("cons by another Maybe Test") {
     Maybe<int> maybe1{10};
     Maybe<int> maybe{maybe1};
     REQUIRE(maybe.Present());
-    REQUIRE(maybe != nothing);
+    REQUIRE(maybe != std::nullopt);
     REQUIRE(*maybe == 10);
     REQUIRE(maybe == maybe1);
 
     auto&& f = [](auto&& elem) -> Maybe<std::string> {
         if(elem == 20) {
-            return nothing;
+            return std::nullopt;
         }
         std::ostringstream ss;
         ss << elem;
@@ -57,7 +57,7 @@ SCENARIO("cons by another Maybe Test") {
 
     REQUIRE(maybe.ValueOr(30) == 20);
 
-    REQUIRE(maybe.Map(f) == nothing);
+    REQUIRE(maybe.Map(f) == std::nullopt);
 }
 
 SCENARIO("copy assignment by another Maybe Test") {
@@ -65,7 +65,7 @@ SCENARIO("copy assignment by another Maybe Test") {
     Maybe<int> maybe{20};
     maybe = maybe1;
     REQUIRE(!maybe.Present());
-    REQUIRE(maybe == nothing);
+    REQUIRE(maybe == std::nullopt);
 
     REQUIRE(maybe == maybe1);
 }

@@ -7,8 +7,13 @@
 
 template<typename T>
 struct Ref_Placement {
-    Ref_Placement() : pointer{nullptr} {}
-    ~Ref_Placement() = default;
+    constexpr Ref_Placement() : pointer{0} {}
+    constexpr explicit Ref_Placement(Ref_Placement const& rhs) : pointer{rhs.pointer} {}
+    constexpr explicit Ref_Placement(T& v) : ref{v} {}
+
+    explicit constexpr operator bool() const {
+        return pointer != 0;
+    }
 
     auto Emplace(T& v) -> T* {
         new (&ref) RefHolder{v};
@@ -26,7 +31,7 @@ struct Ref_Placement {
         return Emplace(v);
     }
 
-    auto GetObj() const -> T const* {
+    constexpr auto GetObj() const -> T* {
         return &GetRef();
     }
 
@@ -34,7 +39,7 @@ struct Ref_Placement {
         return &GetRef();
     }
 
-    auto GetRef() const -> T const& {
+    constexpr auto GetRef() const -> T& {
         return ref.ref;
     }
 
@@ -46,11 +51,11 @@ struct Ref_Placement {
         return GetObj();
     }
 
-    auto operator->() const -> T const* {
+    constexpr auto operator->() const -> T* {
         return GetObj();
     }
 
-    auto operator*() const -> T const& {
+    constexpr auto operator*() const -> T& {
         return GetRef();
     }
 
@@ -59,7 +64,7 @@ struct Ref_Placement {
     }
 
 private:
-    struct RefHolder{
+    struct RefHolder {
         T& ref;
     };
 

@@ -36,25 +36,25 @@ SCENARIO("Foo Default Maybe Test") {
     static_assert(!std::is_trivially_copyable_v<Maybe<Foo>>);
     REQUIRE(!maybe.Present());
     REQUIRE(!maybe);
-    REQUIRE(maybe == nothing);
+    REQUIRE(maybe == std::nullopt);
     Foo defaultValue{10, 20};
     auto& result = maybe.ValueOr(defaultValue);
     REQUIRE(result == Foo{10, 20});
 }
 
 SCENARIO("Foo Nothing Test") {
-    Maybe<Foo> maybe = nothing;
+    Maybe<Foo> maybe = std::nullopt;
     REQUIRE(!maybe.Present());
     REQUIRE(!maybe);
-    REQUIRE(maybe == nothing);
+    REQUIRE(maybe == std::nullopt);
 }
 
 SCENARIO("Foo cons by Nothing Test") {
     {
-        Maybe<Foo> maybe{nothing};
+        Maybe<Foo> maybe{std::nullopt};
         REQUIRE(!maybe.Present());
         REQUIRE(!maybe);
-        REQUIRE(maybe == nothing);
+        REQUIRE(maybe == std::nullopt);
     }
 
     REQUIRE(constructed == 0);
@@ -65,7 +65,7 @@ SCENARIO("Foo cons by value Maybe Test") {
         Maybe<Foo> maybe{10, 20};
         REQUIRE(maybe.Present());
         REQUIRE(maybe);
-        REQUIRE(maybe != nothing);
+        REQUIRE(maybe != std::nullopt);
         REQUIRE(*maybe == Foo{10, 20});
     }
 
@@ -81,7 +81,7 @@ SCENARIO("Foo cons by another Maybe Test") {
         REQUIRE(constructed == 2);
 
         REQUIRE(maybe.Present());
-        REQUIRE(maybe != nothing);
+        REQUIRE(maybe != std::nullopt);
         REQUIRE(*maybe == Foo{10, 20});
         REQUIRE(maybe == maybe1);
 
@@ -106,7 +106,7 @@ SCENARIO("Foo copy assignment by another Maybe Test") {
         REQUIRE(constructed == 0);
 
         REQUIRE(!maybe.Present());
-        REQUIRE(maybe == nothing);
+        REQUIRE(maybe == std::nullopt);
 
         REQUIRE(maybe == maybe1);
     }
