@@ -15,8 +15,7 @@ struct Ref_Placement {
         return &v;
     }
 
-    auto Destroy() -> void {
-    }
+    auto Destroy() -> void {}
 
     auto Replace(T& v) -> T* {
         return Emplace(v);

@@ -1,79 +1,17 @@
 //
-// Created by Darwin Yuan on 2021/6/21.
+// Created by Darwin Yuan on 2021/8/1.
 //
 
-#ifndef OBJECT_ARRAY_PLACEMENT_H
-#define OBJECT_ARRAY_PLACEMENT_H
+#ifndef MAYBE_D967B5CC539C44BE9272834BA1740EEA
+#define MAYBE_D967B5CC539C44BE9272834BA1740EEA
 
-#include <l0-infra/base/detail/StorageTrait.h>
-#include <utility>
-#include <new>
+#include <l0-infra/base/detail/Ref_Placement.h>
+#include <l0-infra/base/detail/Value_Placement.h>
+#include <type_traits>
 
 template<typename T>
-struct Placement {
-    Placement() = default;
-    ~Placement() = default;
+using Placement = std::conditional_t<std::is_reference_v<T>,
+        Ref_Placement<std::remove_reference_t<T>>,
+        Value_Placement<T>>;
 
-    template<typename ... ARGS>
-    auto Emplace(ARGS&& ... args) -> T* {
-        if constexpr(!(sizeof...(ARGS) == 0 && std::is_trivially_default_constructible_v<T>)) {
-            if constexpr (std::is_aggregate_v<T>) {
-                return new (&storage) T{ std::forward<ARGS>(args)... };
-            } else {
-                return new (&storage) T( std::forward<ARGS>(args)... );
-            }
-        } else {
-            return GetObj();
-        }
-    }
-
-    auto Destroy() -> void {
-        if constexpr (!std::is_trivially_destructible_v<T>) {
-            storage.object.~T();
-        }
-    }
-
-    template<typename ... ARGS>
-    auto Replace(ARGS&& ... args) -> T* {
-        static_assert(!std::is_const_v<T>);
-        Destroy();
-        return Emplace(std::forward<ARGS>(args)...);
-    }
-
-    auto GetObj() const -> T const* {
-        return &GetRef();
-    }
-
-    auto GetObj() -> T* {
-        return &GetRef();
-    }
-
-    auto GetRef() const -> T const& {
-        return storage.object;
-    }
-
-    auto GetRef() -> T& {
-        return storage.object;
-    }
-
-    auto operator->() -> T* {
-        return GetObj();
-    }
-
-    auto operator->() const -> T const* {
-        return GetObj();
-    }
-
-    auto operator*() const -> T const& {
-        return storage.object;
-    }
-
-    auto operator*() -> T& {
-        return storage.object;
-    }
-
-private:
-    typename detail::StorageTrait<T>::Type storage;
-};
-
-#endif //OBJECT_ARRAY_PLACEMENT_H
+#endif //MAYBE_D967B5CC539C44BE9272834BA1740EEA
