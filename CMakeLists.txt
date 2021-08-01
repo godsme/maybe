@@ -8,6 +8,6 @@ include_directories(
         "${CMAKE_CURRENT_SOURCE_DIR}/third-party"
 )
 
-set(MAYBE_SRC include/l0-infra/maybe/Maybe.h test/PlacementTest.cpp include/l0-infra/base/RefPlacement.h)
+set(MAYBE_SRC include/l0-infra/maybe/Maybe.h test/Ref_PlacementTest.cpp include/l0-infra/base/Ref_Placement.h)
 
 add_executable(maybe_test test/catch.cpp ${MAYBE_SRC})
