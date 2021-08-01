@@ -71,23 +71,19 @@ namespace detail {
             return value.GetRef();
         }
 
-        template<typename C>
-        friend constexpr auto operator==(Maybe<C> const& lhs, Nothing) -> bool {
+        friend constexpr auto operator==(Maybe const& lhs, Nothing) -> bool {
             return !lhs.present;
         }
 
-        template<typename C>
-        friend constexpr auto operator==(Nothing, Maybe<C> const& rhs) -> bool {
+        friend constexpr auto operator==(Nothing, Maybe const& rhs) -> bool {
             return !rhs.present;
         }
 
-        template<typename C>
-        friend constexpr auto operator!=(Maybe<C> const& lhs, Nothing) -> bool {
+        friend constexpr auto operator!=(Maybe const& lhs, Nothing) -> bool {
             return lhs.present;
         }
 
-        template<typename C>
-        friend constexpr auto operator!=(Nothing, Maybe<C> const& rhs) -> bool {
+        friend constexpr auto operator!=(Nothing, Maybe const& rhs) -> bool {
             return rhs.present;
         }
 

@@ -7,6 +7,7 @@
 SCENARIO("Default Maybe Test") {
     Maybe<int> maybe;
     static_assert(std::is_trivially_destructible_v<Maybe<int>>);
+    static_assert(!std::is_trivially_copyable_v<Maybe<int>>);
     REQUIRE(!maybe.Present());
     REQUIRE(maybe == nothing);
 }
