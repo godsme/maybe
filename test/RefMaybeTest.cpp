@@ -33,6 +33,7 @@ namespace {
 
 SCENARIO("Ref Maybe Test") {
     Maybe<Foo&> maybe;
+    static_assert(sizeof(Maybe<Foo&>) == sizeof(void*));
     static_assert(std::is_trivially_destructible_v<Maybe<Foo&>>);
     static_assert(!std::is_trivially_copyable_v<Maybe<Foo&>>);
     REQUIRE(!maybe.Present());
