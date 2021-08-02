@@ -7,12 +7,13 @@
 #include <catch.hpp>
 
 namespace {
-    using U8 = Int<-127, 127>;
+    using I8 = Int<-127, 127>;
+    static_assert(sizeof(I8) == sizeof(int8_t));
 }
 
-SCENARIO("U8 Maybe Test") {
-    Maybe<U8> maybe1;
-    Maybe<U8> maybe{20};
+SCENARIO("I8 Maybe Test") {
+    Maybe<I8> maybe1;
+    Maybe<I8> maybe{20};
     maybe = maybe1;
     REQUIRE(!maybe.Present());
     REQUIRE(maybe == std::nullopt);
@@ -20,9 +21,9 @@ SCENARIO("U8 Maybe Test") {
     REQUIRE(maybe == maybe1);
 }
 
-SCENARIO("U8 cons by another Maybe Test") {
-    Maybe<U8> maybe1{10};
-    Maybe<U8> maybe{maybe1};
+SCENARIO("I8 cons by another Maybe Test") {
+    Maybe<I8> maybe1{10};
+    Maybe<I8> maybe{maybe1};
     REQUIRE(maybe.Present());
     REQUIRE(maybe != std::nullopt);
     auto value = *maybe;

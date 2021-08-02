@@ -69,7 +69,11 @@ struct Int {
     }
 
     constexpr auto IsValid() const -> bool {
-        return value >= LOWER_BOUNDARY && value <= UPPER_BOUNDARY;
+        if constexpr(LOWER_BOUNDARY != 0) {
+            return value >= LOWER_BOUNDARY && value <= UPPER_BOUNDARY;
+        } else {
+            return value <= UPPER_BOUNDARY;
+        }
     }
 
 protected:
