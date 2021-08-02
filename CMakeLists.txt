@@ -10,6 +10,6 @@ include_directories(
 
 set(MAYBE_SRC include/l0-infra/maybe/Maybe.h test/Ref_PlacementTest.cpp
         include/l0-infra/base/detail/Ref_Placement.h
-        include/l0-infra/base/detail/Val_Placement.h include/l0-infra/base/Placement.h include/l0-infra/base/Placement.h test/PlacementTest.cpp test/TrivalMaybeTest.cpp test/NonTrivialMaybeTest.cpp test/RefMaybeTest.cpp include/l0-infra/maybe/detail/Ref_Maybe.h include/l0-infra/maybe/detail/Val_Maybe.h include/l0-infra/base/BoundedIntType.h include/l0-infra/base/EnumType.h)
+        include/l0-infra/base/detail/Val_Placement.h include/l0-infra/base/Placement.h include/l0-infra/base/Placement.h test/PlacementTest.cpp test/TrivalMaybeTest.cpp test/NonTrivialMaybeTest.cpp test/RefMaybeTest.cpp include/l0-infra/maybe/detail/Ref_Maybe.h include/l0-infra/maybe/detail/Val_Maybe.h include/l0-infra/base/Int.h include/l0-infra/base/Enum.h test/IntTest.cpp include/l0-infra/maybe/detail/Int_Maybe.h)
 
 add_executable(maybe_test test/catch.cpp ${MAYBE_SRC})

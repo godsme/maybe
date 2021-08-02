@@ -7,10 +7,23 @@
 
 #include <l0-infra/maybe/detail/Ref_Maybe.h>
 #include <l0-infra/maybe/detail/Val_Maybe.h>
+#include <l0-infra/maybe/detail/Int_Maybe.h>
 
 namespace detail {
+    template<typename T, typename = void>
+    struct IsIntType : std::false_type {};
+
     template<typename T>
-    using Maybe = std::conditional_t<std::is_reference_v<T>, Ref_Maybe<std::remove_reference_t<T>>, Val_Maybe<T>>;
+    struct IsIntType<T, std::enable_if_t<T::sEcReAt_InT_tAg>> {
+        using IntType = typename T::IntType;
+        constexpr static bool value = T::LOWER_BOUNDARY > std::numeric_limits<IntType>::min() || T::UPPER_BOUNDARY < std::numeric_limits<IntType>::max();
+    };
+
+    template<typename T>
+    using ValueMaybe = std::conditional_t<IsIntType<T>::value, Int_Maybe<T>, Val_Maybe<T>>;
+
+    template<typename T>
+    using Maybe = std::conditional_t<std::is_reference_v<T>, Ref_Maybe<std::remove_reference_t<T>>, ValueMaybe<T>>;
 }
 
 template<typename T>
