@@ -38,7 +38,7 @@ public:
     constexpr Int_Maybe(std::nullopt_t) {}
     constexpr Int_Maybe(T const& value) : value{value} {}
     constexpr Int_Maybe(IntType const& value) : value{value} {}
-    constexpr Int_Maybe(Int_Maybe const& rhs) : value{value} {}
+    constexpr Int_Maybe(Int_Maybe const& rhs) : value{rhs.value} {}
 
     constexpr auto Present() const -> bool {
         return value.IsValid();
