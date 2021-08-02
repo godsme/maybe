@@ -731,7 +731,7 @@ constexpr auto operator "" _catch_sr( char const* rawChars, std::size_t size ) n
 #define CATCH_REC_LIST1_UD(f, userdata, x, peek, ...) , f(userdata, x) CATCH_DEFER ( CATCH_REC_NEXT(peek, CATCH_REC_LIST0_UD) ) ( f, userdata, peek, __VA_ARGS__ )
 #define CATCH_REC_LIST2_UD(f, userdata, x, peek, ...)   f(userdata, x) CATCH_DEFER ( CATCH_REC_NEXT(peek, CATCH_REC_LIST1_UD) ) ( f, userdata, peek, __VA_ARGS__ )
 
-// Applies the function macro `f` to each of the remaining parameters, inserts commas between the results,
+// Applies the function macro `f` to each of the remaining parameters, inserts commas Between the results,
 // and passes userdata as the first parameter to each invocation,
 // e.g. CATCH_REC_LIST_UD(f, x, a, b, c) evaluates to f(x, a), f(x, b), f(x, c)
 #define CATCH_REC_LIST_UD(f, userdata, ...) CATCH_RECURSE(CATCH_REC_LIST2_UD(f, userdata, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
@@ -2315,7 +2315,7 @@ namespace Catch {
         {}
     };
 
-    // Specialised comparison functions to handle equality comparisons between ints and pointers (NULL deduces as an int)
+    // Specialised comparison functions to handle equality comparisons Between ints and pointers (NULL deduces as an int)
     template<typename LhsT, typename RhsT>
     auto compareEqual( LhsT const& lhs, RhsT const& rhs ) -> bool { return static_cast<bool>(lhs == rhs); }
     template<typename T>
@@ -9881,7 +9881,7 @@ namespace Catch {
                 ( "number of resamples for the bootstrap (default: 100000)" )
             | Opt( config.benchmarkConfidenceInterval, "confidence interval" )
                 ["--benchmark-confidence-interval"]
-                ( "confidence interval for the bootstrap (between 0 and 1, default: 0.95)" )
+                ( "confidence interval for the bootstrap (Between 0 and 1, default: 0.95)" )
             | Opt( config.benchmarkNoAnalysis )
                 ["--benchmark-no-analysis"]
                 ( "perform only measurements; do not perform any analysis" )
@@ -10729,7 +10729,7 @@ namespace Catch {
     struct SignalDefs { DWORD id; const char* name; };
 
     // There is no 1-1 mapping between signals and windows exceptions.
-    // Windows can easily distinguish between SO and SigSegV,
+    // Windows can easily distinguish Between SO and SigSegV,
     // but SigInt, SigTerm, etc are handled differently.
     static SignalDefs signalDefs[] = {
         { static_cast<DWORD>(EXCEPTION_ILLEGAL_INSTRUCTION),  "SIGILL - Illegal instruction signal" },
@@ -11797,7 +11797,7 @@ namespace Catch {
             case '[':
             case '{':
             case '(':
-            // It is basically impossible to disambiguate between
+            // It is basically impossible to disambiguate Between
             // comparison and start of template args in this context
 //            case '<':
                 openings.push(c);

@@ -11,17 +11,17 @@
 
 namespace int_type::detail {
     template<typename INT_TYPE>
-    constexpr auto between(long long value) -> bool {
+    constexpr auto Between(long long value) -> bool {
         return value >= std::numeric_limits<INT_TYPE>::min() && value <= std::numeric_limits<INT_TYPE>::max();
     }
 
     template<long long LOWER_BOUNDARY, long long UPPER_BOUNDARY>
     constexpr auto DeduceSignedIntType() -> auto {
-        if constexpr(between<int8_t>(LOWER_BOUNDARY) && between<int8_t>(UPPER_BOUNDARY)) {
+        if constexpr(Between<int8_t>(LOWER_BOUNDARY) && Between<int8_t>(UPPER_BOUNDARY)) {
             return int8_t{};
-        } else if constexpr(between<int16_t>(LOWER_BOUNDARY) && between<int16_t>(UPPER_BOUNDARY)) {
+        } else if constexpr(Between<int16_t>(LOWER_BOUNDARY) && Between<int16_t>(UPPER_BOUNDARY)) {
             return int16_t{};
-        } else if constexpr(between<int32_t>(LOWER_BOUNDARY) && between<int32_t>(UPPER_BOUNDARY)) {
+        } else if constexpr(Between<int32_t>(LOWER_BOUNDARY) && Between<int32_t>(UPPER_BOUNDARY)) {
             return int32_t{};
         } else {
             return int64_t{};
