@@ -5,9 +5,9 @@
 #ifndef MAYBE_8A0D32BE25FC4E61A29F2CA9376105E1
 #define MAYBE_8A0D32BE25FC4E61A29F2CA9376105E1
 
-#include <l0-infra/maybe/detail/Ref_Option.h>
-#include <l0-infra/maybe/detail/Val_Option.h>
-#include <l0-infra/maybe/detail/Int_Option.h>
+#include <l0-infra/option/detail/Ref_Option.h>
+#include <l0-infra/option/detail/Val_Option.h>
+#include <l0-infra/option/detail/Int_Option.h>
 
 namespace detail {
     template<typename T, typename = void>
