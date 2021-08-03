@@ -94,4 +94,8 @@ SCENARIO("String ValueOr by another Maybe Test") {
     REQUIRE(result == std::string("123"));
     REQUIRE(*maybe == std::string("123"));
     REQUIRE(maybe == std::string("123"));
+
+    maybe = std::nullopt;
+
+    REQUIRE(!maybe);
 }
