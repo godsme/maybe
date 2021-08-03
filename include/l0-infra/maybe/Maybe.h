@@ -89,8 +89,37 @@ public:
     }
 
     template<typename F, typename V, typename U = std::invoke_result_t<F, ValueType const&>, std::enable_if_t<std::is_convertible_v<V, U>, bool> = true>
-    constexpr auto MapOr(V const& defaultValue, F&& f) const -> U {
-        return (*this) ? f(*(*this)) : U(defaultValue);
+    constexpr auto MapOr(V&& defaultValue, F&& f) const -> U {
+        if(*this) {
+            return f(*(*this));
+        } else {
+            return std::forward<V>(defaultValue);
+        }
+    }
+
+    template<typename PRED>
+    constexpr auto Filter(PRED&& pred) const -> Maybe {
+        if(*this && pred(*(*this))) {
+            return *this;
+        } else {
+            return std::nullopt;
+        }
+    }
+
+    friend constexpr auto operator==(Maybe const& lhs, T const& rhs) -> bool {
+        return lhs ? *lhs == rhs : false;
+    }
+
+    friend constexpr auto operator==(T const& lhs, Maybe const& rhs) -> bool {
+        return rhs ? *rhs == lhs : false;
+    }
+
+    friend constexpr auto operator!=(Maybe const& lhs, T const& rhs) -> bool {
+        return !operator==(lhs, rhs);
+    }
+
+    friend constexpr auto operator!=(T const& lhs, Maybe const& rhs) -> bool {
+        return !operator==(lhs, rhs);
     }
 
     friend constexpr auto operator==(Maybe const& lhs, std::nullopt_t) -> bool {

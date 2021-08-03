@@ -93,4 +93,5 @@ SCENARIO("String ValueOr by another Maybe Test") {
     auto result = maybe.ValueOr("abc");
     REQUIRE(result == std::string("123"));
     REQUIRE(*maybe == std::string("123"));
+    REQUIRE(maybe == std::string("123"));
 }
