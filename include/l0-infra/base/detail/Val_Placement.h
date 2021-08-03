@@ -11,8 +11,10 @@
 
 template<typename T>
 struct Val_Placement {
-    Val_Placement() = default;
+    constexpr Val_Placement() = default;
     ~Val_Placement() = default;
+    template<typename ... ARGS>
+    constexpr Val_Placement(ARGS&& ... args) : storage{std::forward<ARGS>(args)...} {}
 
     template<typename ... ARGS>
     auto Emplace(ARGS&& ... args) -> T* {
@@ -58,7 +60,7 @@ struct Val_Placement {
         return &GetRef();
     }
 
-    auto GetRef() const -> T const& {
+    constexpr auto GetRef() const -> T const& {
         return storage.object;
     }
 
@@ -74,7 +76,7 @@ struct Val_Placement {
         return GetObj();
     }
 
-    auto operator*() const -> T const& {
+    constexpr auto operator*() const -> T const& {
         return storage.object;
     }
 

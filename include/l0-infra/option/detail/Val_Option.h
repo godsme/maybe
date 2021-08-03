@@ -35,8 +35,9 @@ namespace detail::base {
         constexpr Val_Option(Val_Option<T>& rhs) : Val_Option{const_cast<Val_Option<T> const&>(rhs)} {}
 
         template<typename ARG, typename ... ARGS>
-        constexpr Val_Option(ARG&& arg, ARGS&& ... args) : present{true} {
-            value.Emplace(std::forward<ARG>(arg), std::forward<ARGS>(args)...);
+        constexpr Val_Option(ARG&& arg, ARGS&& ... args)
+            : present{true}
+            , value{std::forward<ARG>(arg), std::forward<ARGS>(args)...} {
         }
 
         auto operator=(Val_Option const& rhs) -> Val_Option& {

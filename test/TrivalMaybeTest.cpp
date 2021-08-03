@@ -6,12 +6,12 @@
 #include <sstream>
 
 SCENARIO("Default Option Test") {
-    Option<int> maybe;
+    constexpr Option<int> maybe{};
+    static_assert(!maybe.Present());
+    static_assert(maybe == std::nullopt);
+    static_assert(maybe == Option<int>{});
     static_assert(std::is_trivially_destructible_v<Option<int>>);
     static_assert(!std::is_trivially_copyable_v<Option<int>>);
-    REQUIRE(!maybe.Present());
-    REQUIRE(maybe == std::nullopt);
-    REQUIRE(maybe == Option<int>{});
 }
 
 SCENARIO("Nothing Test") {
@@ -27,10 +27,14 @@ SCENARIO("cons by Nothing Test") {
 }
 
 SCENARIO("cons by value Option Test") {
-    Option<int> maybe{10};
+    constexpr Option<int> maybe{10};
+    static_assert((bool)maybe);
+    static_assert(maybe.Present());
+    static_assert(maybe != std::nullopt);
+    static_assert(maybe == 10);
     REQUIRE(maybe.Present());
     REQUIRE(maybe != std::nullopt);
-    REQUIRE(*maybe == 10);
+    REQUIRE(maybe == 10);
 }
 
 SCENARIO("cons by another Option Test") {

@@ -8,39 +8,32 @@
 #include <type_traits>
 
 namespace detail {
+    struct UnionDummy {
+        constexpr UnionDummy() = default;
+    };
+
     template<typename T,
-            bool = std::is_trivially_default_constructible_v<T>,
             bool = std::is_trivially_destructible_v<T>>
     struct StorageTrait {
         union Type {
+            template<typename ... ARGS>
+            constexpr Type(ARGS&& ... args) : object(std::forward<ARGS>(args)...) {}
+            constexpr Type() : dummy() {}
             T object;
+            UnionDummy dummy;
         };
     };
 
     template<typename T>
-    struct StorageTrait<T, true, false> {
+    struct StorageTrait<T, false> {
         union Type {
+            template<typename ... ARGS>
+            constexpr Type(ARGS&& ... args) : object(std::forward<ARGS>(args)...) {}
+            constexpr Type() : dummy() {}
             Type(Type const&) = delete;
             ~Type() {}
             T object;
-        };
-    };
-
-    template<typename T>
-    struct StorageTrait<T, false, true> {
-        union Type {
-            Type() {}
-            T object;
-        };
-    };
-
-    template<typename T>
-    struct StorageTrait<T, false, false> {
-        union Type {
-            Type() {}
-            Type(Type const&) = delete;
-            ~Type() {}
-            T object;
+            UnionDummy dummy;
         };
     };
 }
