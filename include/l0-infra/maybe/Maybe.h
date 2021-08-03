@@ -28,22 +28,9 @@ namespace detail {
 
 template<typename T>
 struct Maybe : detail::Maybe<T> {
+private:
     using Parent = detail::Maybe<T>;
-    using Parent::Parent;
-
     using ValueType = std::remove_reference_t<T>;
-
-    constexpr auto operator*() const -> decltype(auto) {
-        return Parent::Value();
-    }
-
-    auto operator*() -> decltype(auto) {
-        return Parent::Value();
-    }
-
-    constexpr explicit operator bool() const {
-        return Parent::Present();
-    }
 
 private:
     template<typename C>
@@ -67,10 +54,24 @@ private:
     struct IsMaybeType<Maybe<C>> : std::true_type {};
 
 public:
+    using Parent::Parent;
+
+    constexpr auto operator*() const -> decltype(auto) {
+        return Parent::Value();
+    }
+
+    auto operator*() -> decltype(auto) {
+        return Parent::Value();
+    }
+
+    constexpr explicit operator bool() const {
+        return Parent::Present();
+    }
+
     constexpr auto Flatten() const -> Maybe<Unwrap_t<T>>  {
         if constexpr(IsMaybeType<T>::value) {
-            if(!Parent::Present()) return {};
-            return Parent::Value().Flatten();
+            if(!(*this)) return {};
+            return (*(*this)).Flatten();
         } else {
             return *this;
         }
@@ -81,10 +82,15 @@ public:
         using result_t = std::invoke_result_t<F, ValueType const&>;
         using maybe_result_t = Maybe<Unwrap_t<result_t>>;
         if(*this) {
-            return Maybe<result_t>{f(Parent::Value())}.Flatten();
+            return Maybe<result_t>{f(*(*this))}.Flatten();
         } else {
             return maybe_result_t{};
         }
+    }
+
+    template<typename F, typename V, typename U = std::invoke_result_t<F, ValueType const&>, std::enable_if_t<std::is_convertible_v<V, U>, bool> = true>
+    constexpr auto MapOr(V const& defaultValue, F&& f) const -> U {
+        return (*this) ? f(*(*this)) : U(defaultValue);
     }
 
     friend constexpr auto operator==(Maybe const& lhs, std::nullopt_t) -> bool {

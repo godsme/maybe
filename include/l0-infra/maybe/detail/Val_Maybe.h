@@ -96,7 +96,11 @@ namespace detail::base {
 
         constexpr auto ValueOr(T&& defaultValue) & -> T {
             static_assert(std::is_copy_assignable_v<T>);
-            return present ?  Value() : std::move(defaultValue);
+            if(present) {
+                return Value();
+            } else {
+                return std::move(defaultValue);
+            }
         }
 
         constexpr auto ValueOr(T&& defaultValue) && -> T {

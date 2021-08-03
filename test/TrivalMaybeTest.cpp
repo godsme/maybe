@@ -60,6 +60,17 @@ SCENARIO("cons by another Maybe Test") {
     REQUIRE(maybe.Map(f) == std::nullopt);
 }
 
+SCENARIO("MapOr Maybe Test") {
+    Maybe<int> maybe;
+    auto&& f = [](auto&& elem) -> std::string {
+        std::ostringstream ss;
+        ss << elem;
+        return ss.str();
+    };
+
+    REQUIRE(maybe.MapOr("20", f) == std::string("20"));
+}
+
 SCENARIO("copy assignment by another Maybe Test") {
     Maybe<int> maybe1;
     Maybe<int> maybe{20};
@@ -68,4 +79,18 @@ SCENARIO("copy assignment by another Maybe Test") {
     REQUIRE(maybe == std::nullopt);
 
     REQUIRE(maybe == maybe1);
+}
+
+SCENARIO("String nothing ValueOr by another Maybe Test") {
+    Maybe<std::string> maybe;
+    auto result = maybe.ValueOr("abc");
+    REQUIRE(result == std::string("abc"));
+}
+
+SCENARIO("String ValueOr by another Maybe Test") {
+    Maybe<std::string> maybe{"123"};
+    REQUIRE(maybe);
+    auto result = maybe.ValueOr("abc");
+    REQUIRE(result == std::string("123"));
+    REQUIRE(*maybe == std::string("123"));
 }
