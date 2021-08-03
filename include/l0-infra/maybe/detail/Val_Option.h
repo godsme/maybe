@@ -2,15 +2,15 @@
 // Created by Darwin Yuan on 2021/8/2.
 //
 
-#ifndef MAYBE_62B5DE9ED38046C4B5B695A4AE7F2779
-#define MAYBE_62B5DE9ED38046C4B5B695A4AE7F2779
+#ifndef MAYBE_E975E67EA14440689D8586A383B22E5C
+#define MAYBE_E975E67EA14440689D8586A383B22E5C
 
 #include <l0-infra/base/detail/Val_Placement.h>
 #include <optional>
 
 namespace detail::base {
     template<typename T>
-    struct Val_Maybe {
+    struct Val_Option {
         static_assert(!std::is_reference_v<T>);
     protected:
         auto destroy() -> void {
@@ -18,28 +18,28 @@ namespace detail::base {
         }
 
     public:
-        constexpr Val_Maybe() : present{false} {}
-        constexpr Val_Maybe(std::nullopt_t) : Val_Maybe() {}
-        constexpr Val_Maybe(Val_Maybe<T> const& rhs) : present{rhs.present} {
+        constexpr Val_Option() : present{false} {}
+        constexpr Val_Option(std::nullopt_t) : Val_Option() {}
+        constexpr Val_Option(Val_Option<T> const& rhs) : present{rhs.present} {
             if(present) {
                 value = rhs.value;
             }
         }
 
-        constexpr Val_Maybe(Val_Maybe<T>&& rhs) : present{rhs.present} {
+        constexpr Val_Option(Val_Option<T>&& rhs) : present{rhs.present} {
             if(present) {
                 value = std::move(rhs.value);
             }
         }
 
-        constexpr Val_Maybe(Val_Maybe<T>& rhs) : Val_Maybe{const_cast<Val_Maybe<T> const&>(rhs)} {}
+        constexpr Val_Option(Val_Option<T>& rhs) : Val_Option{const_cast<Val_Option<T> const&>(rhs)} {}
 
         template<typename ARG, typename ... ARGS>
-        constexpr Val_Maybe(ARG&& arg, ARGS&& ... args) : present{true} {
+        constexpr Val_Option(ARG&& arg, ARGS&& ... args) : present{true} {
             value.Emplace(std::forward<ARG>(arg), std::forward<ARGS>(args)...);
         }
 
-        auto operator=(Val_Maybe const& rhs) -> Val_Maybe& {
+        auto operator=(Val_Option const& rhs) -> Val_Option& {
             if constexpr(!std::is_trivially_destructible_v<T>) {
                 destroy();
             }
@@ -50,7 +50,7 @@ namespace detail::base {
             return *this;
         }
 
-        auto operator=(Val_Maybe&& rhs) -> Val_Maybe& {
+        auto operator=(Val_Option&& rhs) -> Val_Option& {
             if constexpr(!std::is_trivially_destructible_v<T>) {
                 destroy();
             }
@@ -125,14 +125,14 @@ namespace detail::base {
 
 namespace detail {
     template<typename T, bool = std::is_trivially_destructible_v<T>>
-    struct Val_Maybe : base::Val_Maybe<T> {
-        using Parent = base::Val_Maybe<T>;
+    struct Val_Maybe : base::Val_Option<T> {
+        using Parent = base::Val_Option<T>;
         using Parent::Parent;
     };
 
     template<typename T>
-    struct Val_Maybe<T, false> : base::Val_Maybe<T> {
-        using Parent = base::Val_Maybe<T>;
+    struct Val_Maybe<T, false> : base::Val_Option<T> {
+        using Parent = base::Val_Option<T>;
         using Parent::Parent;
 
         Val_Maybe(Val_Maybe const&) = default;
@@ -147,4 +147,4 @@ namespace detail {
     };
 }
 
-#endif //MAYBE_62B5DE9ED38046C4B5B695A4AE7F2779
+#endif //MAYBE_E975E67EA14440689D8586A383B22E5C

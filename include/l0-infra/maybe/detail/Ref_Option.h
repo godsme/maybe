@@ -2,23 +2,23 @@
 // Created by Darwin Yuan on 2021/8/2.
 //
 
-#ifndef MAYBE_07C6172EDA2C406B9355BE40E15AA134
-#define MAYBE_07C6172EDA2C406B9355BE40E15AA134
+#ifndef MAYBE_DE58EF5F44BE45C0AACA977FB4197456
+#define MAYBE_DE58EF5F44BE45C0AACA977FB4197456
 
 #include <l0-infra/base/detail/Ref_Placement.h>
 #include <optional>
 
 namespace detail {
     template<typename T>
-    struct Ref_Maybe {
+    struct Ref_Option {
         static_assert(!std::is_reference_v<T>);
 
-        constexpr Ref_Maybe() {}
-        constexpr Ref_Maybe(std::nullopt_t) {}
-        constexpr Ref_Maybe(Ref_Maybe<T> const& rhs) : value{rhs.value} {}
-        constexpr Ref_Maybe(T& ref) : value{ref} {}
+        constexpr Ref_Option() {}
+        constexpr Ref_Option(std::nullopt_t) {}
+        constexpr Ref_Option(Ref_Option<T> const& rhs) : value{rhs.value} {}
+        constexpr Ref_Option(T& ref) : value{ref} {}
 
-        auto operator=(Ref_Maybe const& rhs) -> Ref_Maybe& {
+        auto operator=(Ref_Option const& rhs) -> Ref_Option& {
             value = rhs.value;
             return *this;
         }
@@ -50,4 +50,4 @@ namespace detail {
     };
 }
 
-#endif //MAYBE_07C6172EDA2C406B9355BE40E15AA134
+#endif //MAYBE_DE58EF5F44BE45C0AACA977FB4197456

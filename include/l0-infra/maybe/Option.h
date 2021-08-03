@@ -2,12 +2,12 @@
 // Created by Darwin Yuan on 2021/8/1.
 //
 
-#ifndef MAYBE_5B22D47F4DD54C17BAE28C385C86B3FC
-#define MAYBE_5B22D47F4DD54C17BAE28C385C86B3FC
+#ifndef MAYBE_8A0D32BE25FC4E61A29F2CA9376105E1
+#define MAYBE_8A0D32BE25FC4E61A29F2CA9376105E1
 
-#include <l0-infra/maybe/detail/Ref_Maybe.h>
-#include <l0-infra/maybe/detail/Val_Maybe.h>
-#include <l0-infra/maybe/detail/Int_Maybe.h>
+#include <l0-infra/maybe/detail/Ref_Option.h>
+#include <l0-infra/maybe/detail/Val_Option.h>
+#include <l0-infra/maybe/detail/Int_Option.h>
 
 namespace detail {
     template<typename T, typename = void>
@@ -20,16 +20,16 @@ namespace detail {
     };
 
     template<typename T>
-    using ValueMaybe = std::conditional_t<IsIntType<T>::value, Int_Maybe<T>, Val_Maybe<T>>;
+    using ValueOption = std::conditional_t<IsIntType<T>::value, Int_Option<T>, Val_Maybe<T>>;
 
     template<typename T>
-    using Maybe = std::conditional_t<std::is_reference_v<T>, Ref_Maybe<std::remove_reference_t<T>>, ValueMaybe<T>>;
+    using Option = std::conditional_t<std::is_reference_v<T>, Ref_Option<std::remove_reference_t<T>>, ValueOption<T>>;
 }
 
 template<typename T>
-struct Maybe : detail::Maybe<T> {
+struct Option : detail::Option<T> {
 private:
-    using Parent = detail::Maybe<T>;
+    using Parent = detail::Option<T>;
     using ValueType = std::remove_reference_t<T>;
 
 private:
@@ -39,7 +39,7 @@ private:
     };
 
     template<typename C>
-    struct Unwrap<Maybe<C>> {
+    struct Unwrap<Option<C>> {
         using Type = typename Unwrap<C>::Type;
     };
 
@@ -48,10 +48,10 @@ private:
 
 
     template<typename>
-    struct IsMaybeType : std::false_type {};
+    struct IsOptionType : std::false_type {};
 
     template<typename C>
-    struct IsMaybeType<Maybe<C>> : std::true_type {};
+    struct IsOptionType<Option<C>> : std::true_type {};
 
 public:
     using Parent::Parent;
@@ -68,8 +68,8 @@ public:
         return Parent::Present();
     }
 
-    constexpr auto Flatten() const -> Maybe<Unwrap_t<T>>  {
-        if constexpr(IsMaybeType<T>::value) {
+    constexpr auto Flatten() const -> Option<Unwrap_t<T>>  {
+        if constexpr(IsOptionType<T>::value) {
             if(!(*this)) return {};
             return (*(*this)).Flatten();
         } else {
@@ -80,9 +80,9 @@ public:
     template<typename F>
     constexpr auto Map(F&& f) const -> auto {
         using result_t = std::invoke_result_t<F, ValueType const&>;
-        using maybe_result_t = Maybe<Unwrap_t<result_t>>;
+        using maybe_result_t = Option<Unwrap_t<result_t>>;
         if(*this) {
-            return Maybe<result_t>{f(*(*this))}.Flatten();
+            return Option<result_t>{f(*(*this))}.Flatten();
         } else {
             return maybe_result_t{};
         }
@@ -98,7 +98,7 @@ public:
     }
 
     template<typename PRED>
-    constexpr auto Filter(PRED&& pred) const -> Maybe {
+    constexpr auto Filter(PRED&& pred) const -> Option {
         if(*this && pred(*(*this))) {
             return *this;
         } else {
@@ -106,27 +106,27 @@ public:
         }
     }
 
-    friend constexpr auto operator==(Maybe const& lhs, T const& rhs) -> bool {
+    friend constexpr auto operator==(Option const& lhs, T const& rhs) -> bool {
         return lhs ? *lhs == rhs : false;
     }
 
-    friend constexpr auto operator==(T const& lhs, Maybe const& rhs) -> bool {
+    friend constexpr auto operator==(T const& lhs, Option const& rhs) -> bool {
         return rhs ? *rhs == lhs : false;
     }
 
-    friend constexpr auto operator!=(Maybe const& lhs, T const& rhs) -> bool {
+    friend constexpr auto operator!=(Option const& lhs, T const& rhs) -> bool {
         return !operator==(lhs, rhs);
     }
 
-    friend constexpr auto operator!=(T const& lhs, Maybe const& rhs) -> bool {
+    friend constexpr auto operator!=(T const& lhs, Option const& rhs) -> bool {
         return !operator==(lhs, rhs);
     }
 
-    friend constexpr auto operator==(Maybe const& lhs, std::nullopt_t) -> bool {
+    friend constexpr auto operator==(Option const& lhs, std::nullopt_t) -> bool {
         return !lhs;
     }
 
-    friend constexpr auto operator==(Maybe const& lhs, Maybe const& rhs) -> bool {
+    friend constexpr auto operator==(Option const& lhs, Option const& rhs) -> bool {
         if(lhs) {
             return rhs ? *lhs == *rhs : false;
         } else {
@@ -134,24 +134,24 @@ public:
         }
     }
 
-    friend constexpr auto operator!=(Maybe const& lhs, Maybe const& rhs) -> bool {
+    friend constexpr auto operator!=(Option const& lhs, Option const& rhs) -> bool {
         return !operator==(lhs, rhs);
     }
 
-    friend constexpr auto operator==(std::nullopt_t, Maybe const& rhs) -> bool {
+    friend constexpr auto operator==(std::nullopt_t, Option const& rhs) -> bool {
         return !rhs;
     }
 
-    friend constexpr auto operator!=(Maybe const& lhs, std::nullopt_t) -> bool {
+    friend constexpr auto operator!=(Option const& lhs, std::nullopt_t) -> bool {
         return (bool)lhs;
     }
 
-    friend constexpr auto operator!=(std::nullopt_t, Maybe const& rhs) -> bool {
+    friend constexpr auto operator!=(std::nullopt_t, Option const& rhs) -> bool {
         return (bool)rhs;
     }
 };
 
 template<typename T>
-Maybe(T&&) -> Maybe<T>;
+Option(T&&) -> Option<T>;
 
-#endif //MAYBE_5B22D47F4DD54C17BAE28C385C86B3FC
+#endif //MAYBE_8A0D32BE25FC4E61A29F2CA9376105E1

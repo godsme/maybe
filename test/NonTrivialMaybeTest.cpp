@@ -1,7 +1,7 @@
 //
 // Created by Darwin Yuan on 2021/8/1.
 //
-#include <l0-infra/maybe/Maybe.h>
+#include <l0-infra/maybe/Option.h>
 #include <catch.hpp>
 
 namespace {
@@ -30,10 +30,10 @@ namespace {
     static_assert(!std::is_copy_constructible_v<Foo>);
 }
 
-SCENARIO("Foo Default Maybe Test") {
-    Maybe<Foo> maybe;
-    static_assert(!std::is_trivially_destructible_v<Maybe<Foo>>);
-    static_assert(!std::is_trivially_copyable_v<Maybe<Foo>>);
+SCENARIO("Foo Default Option Test") {
+    Option<Foo> maybe;
+    static_assert(!std::is_trivially_destructible_v<Option<Foo>>);
+    static_assert(!std::is_trivially_copyable_v<Option<Foo>>);
     REQUIRE(!maybe.Present());
     REQUIRE(!maybe);
     REQUIRE(maybe == std::nullopt);
@@ -43,7 +43,7 @@ SCENARIO("Foo Default Maybe Test") {
 }
 
 SCENARIO("Foo Nothing Test") {
-    Maybe<Foo> maybe = std::nullopt;
+    Option<Foo> maybe = std::nullopt;
     REQUIRE(!maybe.Present());
     REQUIRE(!maybe);
     REQUIRE(maybe == std::nullopt);
@@ -51,7 +51,7 @@ SCENARIO("Foo Nothing Test") {
 
 SCENARIO("Foo cons by Nothing Test") {
     {
-        Maybe<Foo> maybe{std::nullopt};
+        Option<Foo> maybe{std::nullopt};
         REQUIRE(!maybe.Present());
         REQUIRE(!maybe);
         REQUIRE(maybe == std::nullopt);
@@ -60,9 +60,9 @@ SCENARIO("Foo cons by Nothing Test") {
     REQUIRE(constructed == 0);
 }
 
-SCENARIO("Foo cons by value Maybe Test") {
+SCENARIO("Foo cons by value Option Test") {
     {
-        Maybe<Foo> maybe{10, 20};
+        Option<Foo> maybe{10, 20};
         REQUIRE(maybe.Present());
         REQUIRE(maybe);
         REQUIRE(maybe != std::nullopt);
@@ -72,11 +72,11 @@ SCENARIO("Foo cons by value Maybe Test") {
     REQUIRE(constructed == 0);
 }
 
-SCENARIO("Foo cons by another Maybe Test") {
+SCENARIO("Foo cons by another Option Test") {
     constructed = 0;
     {
-        Maybe<Foo> maybe1{10, 20};
-        Maybe<Foo> maybe{std::move(maybe1)};
+        Option<Foo> maybe1{10, 20};
+        Option<Foo> maybe{std::move(maybe1)};
 
         REQUIRE(constructed == 2);
 
@@ -93,12 +93,12 @@ SCENARIO("Foo cons by another Maybe Test") {
     REQUIRE(constructed == 0);
 }
 
-SCENARIO("Foo copy assignment by another Maybe Test") {
+SCENARIO("Foo copy assignment by another Option Test") {
     {
-        Maybe<Foo> maybe1;
+        Option<Foo> maybe1;
         REQUIRE(constructed == 0);
 
-        Maybe<Foo> maybe{10, 20};
+        Option<Foo> maybe{10, 20};
         REQUIRE(maybe != maybe1);
         REQUIRE(constructed == 1);
 

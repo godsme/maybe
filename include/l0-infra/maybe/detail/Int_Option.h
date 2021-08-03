@@ -2,14 +2,14 @@
 // Created by Darwin Yuan on 2021/8/3.
 //
 
-#ifndef MAYBE_1FE4415056474623A46B184C7ADB11F1
-#define MAYBE_1FE4415056474623A46B184C7ADB11F1
+#ifndef MAYBE_ED27CD07A5DD4F89977DB024ECC1D0B8
+#define MAYBE_ED27CD07A5DD4F89977DB024ECC1D0B8
 
 #include <limits>
 #include <optional>
 
 template<typename T>
-struct Int_Maybe {
+struct Int_Option {
     static_assert(T::sEcReAt_InT_tAg);
     using IntType = typename T::IntType;
 
@@ -34,11 +34,11 @@ private:
 public:
     constexpr static IntType EMPTY = GetEmpty();
 
-    constexpr Int_Maybe() {}
-    constexpr Int_Maybe(std::nullopt_t) {}
-    constexpr Int_Maybe(T const& value) : value{value} {}
-    constexpr Int_Maybe(IntType const& value) : value{value} {}
-    constexpr Int_Maybe(Int_Maybe const& rhs) : value{rhs.value} {}
+    constexpr Int_Option() {}
+    constexpr Int_Option(std::nullopt_t) {}
+    constexpr Int_Option(T const& value) : value{value} {}
+    constexpr Int_Option(IntType const& value) : value{value} {}
+    constexpr Int_Option(Int_Option const& rhs) : value{rhs.value} {}
 
     constexpr auto Present() const -> bool {
         return value.IsValid();
@@ -64,4 +64,4 @@ private:
     T value{EMPTY};
 };
 
-#endif //MAYBE_1FE4415056474623A46B184C7ADB11F1
+#endif //MAYBE_ED27CD07A5DD4F89977DB024ECC1D0B8
