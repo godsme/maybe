@@ -103,4 +103,8 @@ SCENARIO("String ValueOr by another Option Test") {
     maybe = std::nullopt;
 
     REQUIRE(!maybe);
+
+    auto&& str = Option<std::string>{"123"}.Value();
+    REQUIRE(str == std::string("123"));
+    static_assert(std::is_same_v<std::string&&, decltype(Option<std::string>{"123"}.Value())>);
 }

@@ -66,12 +66,20 @@ namespace detail::base {
             return present;
         }
 
-        constexpr auto Value() const -> decltype(auto) {
+        constexpr auto Value() const& -> decltype(auto) {
             return value.GetRef();
         }
 
-        auto Value() -> decltype(auto) {
+        constexpr auto Value() const&& -> decltype(auto) {
+            return std::move(value).GetRef();
+        }
+
+        auto Value() & -> decltype(auto) {
             return value.GetRef();
+        }
+
+        auto Value() && -> decltype(auto) {
+            return std::move(value).GetRef();
         }
 
         constexpr auto ValueOr(T const& defaultValue) const& -> decltype(auto) {
