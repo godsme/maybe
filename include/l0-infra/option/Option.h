@@ -20,7 +20,7 @@ namespace detail {
     };
 
     template<typename T>
-    using ValueOption = std::conditional_t<IsIntType<T>::value, Int_Option<T>, Val_Maybe<T>>;
+    using ValueOption = std::conditional_t<IsIntType<T>::value, Int_Option<T>, Val_Option<T>>;
 
     template<typename T>
     using Option = std::conditional_t<std::is_reference_v<T>, Ref_Option<std::remove_reference_t<T>>, ValueOption<T>>;

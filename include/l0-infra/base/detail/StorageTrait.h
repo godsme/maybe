@@ -6,34 +6,47 @@
 #define OBJECT_ARRAY_STORAGETRAIT_H
 
 #include <type_traits>
+#include <utility>
 
 namespace detail {
-    struct UnionDummy {
-        constexpr UnionDummy() = default;
-    };
+    template<typename T, bool = std::is_trivially_destructible_v<T>>
+    struct Storage;
 
-    template<typename T,
-            bool = std::is_trivially_destructible_v<T>>
-    struct StorageTrait {
-        union Type {
-            template<typename ... ARGS>
-            constexpr Type(ARGS&& ... args) : object(std::forward<ARGS>(args)...) {}
-            constexpr Type() : dummy() {}
+    template<typename T>
+    struct Storage<T, true> {
+        constexpr Storage() : __null_type__{} {}
+
+        template<typename ... ARGS>
+        constexpr Storage(std::in_place_t, ARGS&& ... args)
+            : object(std::forward<ARGS>(args)...)
+        {}
+
+        auto Destroy() {}
+
+        union {
             T object;
-            UnionDummy dummy;
+            char __null_type__;
         };
     };
 
     template<typename T>
-    struct StorageTrait<T, false> {
-        union Type {
-            template<typename ... ARGS>
-            constexpr Type(ARGS&& ... args) : object(std::forward<ARGS>(args)...) {}
-            constexpr Type() : dummy() {}
-            Type(Type const&) = delete;
-            ~Type() {}
+    struct Storage<T, false> {
+        constexpr Storage() : __null_type__{} {}
+
+        template<typename ... ARGS>
+        constexpr Storage(std::in_place_t, ARGS&& ... args)
+            : object(std::forward<ARGS>(args)...)
+        {}
+
+        ~Storage() {}
+
+        auto Destroy() {
+            object.~T();
+        }
+
+        union {
             T object;
-            UnionDummy dummy;
+            char __null_type__;
         };
     };
 }

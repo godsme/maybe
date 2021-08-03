@@ -4,6 +4,7 @@
 #include <l0-infra/option/Option.h>
 #include <catch.hpp>
 #include <sstream>
+#include <optional>
 
 SCENARIO("Default Option Test") {
     constexpr Option<int> maybe{};
@@ -38,7 +39,7 @@ SCENARIO("cons by value Option Test") {
 }
 
 SCENARIO("cons by another Option Test") {
-    Option<int> maybe1{10};
+    constexpr Option<int> maybe1{10};
     Option<int> maybe{maybe1};
     REQUIRE(maybe.Present());
     REQUIRE(maybe != std::nullopt);

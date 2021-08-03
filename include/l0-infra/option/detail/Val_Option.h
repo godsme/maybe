@@ -13,51 +13,51 @@ namespace detail::base {
     struct Val_Option {
         static_assert(!std::is_reference_v<T>);
     protected:
-        auto destroy() -> void {
+        auto Destroy() -> void {
             if(present) value.Destroy();
         }
 
     public:
-        constexpr Val_Option() : present{false} {}
-        constexpr Val_Option(std::nullopt_t) : Val_Option() {}
-        constexpr Val_Option(Val_Option<T> const& rhs) : present{rhs.present} {
+        constexpr Val_Option() noexcept : present{false} {}
+        constexpr Val_Option(std::nullopt_t) noexcept : Val_Option() {}
+        constexpr Val_Option(Val_Option const& rhs) : present{rhs.present} {
             if(present) {
-                value = rhs.value;
+                value.Emplace(rhs.value.GetRef());
             }
         }
 
-        constexpr Val_Option(Val_Option<T>&& rhs) : present{rhs.present} {
+        constexpr Val_Option(Val_Option&& rhs) : present{rhs.present} {
             if(present) {
-                value = std::move(rhs.value);
+                value.Emplace(std::move(rhs.value.GetRef()));
             }
         }
 
         constexpr Val_Option(Val_Option<T>& rhs) : Val_Option{const_cast<Val_Option<T> const&>(rhs)} {}
 
-        template<typename ARG, typename ... ARGS>
-        constexpr Val_Option(ARG&& arg, ARGS&& ... args)
+        template<typename ... ARGS>
+        constexpr Val_Option(ARGS&& ... args)
             : present{true}
-            , value{std::forward<ARG>(arg), std::forward<ARGS>(args)...} {
+            , value{std::in_place, std::forward<ARGS>(args)...} {
         }
 
         auto operator=(Val_Option const& rhs) -> Val_Option& {
             if constexpr(!std::is_trivially_destructible_v<T>) {
-                destroy();
+                Destroy();
             }
 
             present = rhs.present;
-            if(present) value = rhs.value;
+            if(present) value.Emplace(rhs.value.GetRef());
 
             return *this;
         }
 
         auto operator=(Val_Option&& rhs) -> Val_Option& {
             if constexpr(!std::is_trivially_destructible_v<T>) {
-                destroy();
+                Destroy();
             }
 
             present = rhs.present;
-            if(present) value = std::move(rhs.value);
+            if(present) value.Emplace(std::move(rhs.value.GetRef()));
 
             return *this;
         }
@@ -112,7 +112,7 @@ namespace detail::base {
         template<typename ... ARGS>
         auto Emplace(ARGS&& ... args) -> auto {
             if constexpr(!std::is_trivially_destructible_v<T>) {
-                destroy();
+                Destroy();
             }
             present = true;
             return value.Emplace(std::forward<ARGS...>(args)...);
@@ -126,24 +126,24 @@ namespace detail::base {
 
 namespace detail {
     template<typename T, bool = std::is_trivially_destructible_v<T>>
-    struct Val_Maybe : base::Val_Option<T> {
+    struct Val_Option : base::Val_Option<T> {
         using Parent = base::Val_Option<T>;
         using Parent::Parent;
     };
 
     template<typename T>
-    struct Val_Maybe<T, false> : base::Val_Option<T> {
+    struct Val_Option<T, false> : base::Val_Option<T> {
         using Parent = base::Val_Option<T>;
         using Parent::Parent;
 
-        Val_Maybe(Val_Maybe const&) = default;
-        Val_Maybe(Val_Maybe&&) = default;
+        Val_Option(Val_Option const&) = default;
+        Val_Option(Val_Option&&) = default;
 
-        auto operator=(Val_Maybe const&) -> Val_Maybe& = default;
-        auto operator=(Val_Maybe&&) -> Val_Maybe& = default;
+        auto operator=(Val_Option const&) -> Val_Option& = default;
+        auto operator=(Val_Option&&) -> Val_Option& = default;
 
-        ~Val_Maybe() {
-            Parent::destroy();
+        ~Val_Option() {
+            Parent::Destroy();
         }
     };
 }
