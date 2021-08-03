@@ -5,7 +5,7 @@
 #ifndef PLACEMENT_DECEC01733DA4EE6825B4A610EBE5D47
 #define PLACEMENT_DECEC01733DA4EE6825B4A610EBE5D47
 
-#include <l0-infra/base/detail/StorageTrait.h>
+#include <l0-infra/base/detail/Storage.h>
 #include <utility>
 #include <new>
 
