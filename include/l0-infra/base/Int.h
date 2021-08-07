@@ -80,4 +80,7 @@ protected:
     IntType value;
 };
 
+template<long long UPPER_BOUNDARY>
+using UnsignedInt = Int<0, UPPER_BOUNDARY>;
+
 #endif //MAYBE_ABCD9ABF21A34875BA01686B71801245
