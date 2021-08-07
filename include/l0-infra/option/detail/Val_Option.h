@@ -15,36 +15,48 @@ namespace detail::base {
         
     protected:
         auto Destroy() -> void {
-            if(present) value.Destroy();
+            if constexpr(!std::is_trivially_destructible_v<T>) {
+                if(present) {
+                    value.Destroy();
+                    present = false;
+                }
+            }
+        }
+
+        template<typename ... ARGS>
+        auto Construct(ARGS&& ... args) -> decltype(auto) {
+            present = true;
+            return value.Emplace(std::forward<ARGS>(args)...);
+        }
+
+        template<typename THAT>
+        auto ConstructFrom(THAT&& that) -> void {
+            if(that.Present()) {
+                Construct(std::forward<THAT>(that).Value());
+            }
         }
 
     public:
-        constexpr Val_Option() noexcept : present{false} {}
-        constexpr Val_Option(std::nullopt_t) noexcept : Val_Option() {}
-
-        constexpr Val_Option(Val_Option const& rhs) : present{rhs.present} {
-            if(present) {
-                value.Emplace(rhs.value.GetRef());
-            }
+        constexpr Val_Option() noexcept {}
+        constexpr Val_Option(std::nullopt_t) noexcept {}
+        constexpr Val_Option(Val_Option const& rhs) {
+            ConstructFrom(rhs);
         }
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
-        constexpr Val_Option(Val_Option<U> const& rhs) : present{rhs.present} {
-            if(present) {
-                value.Emplace(static_cast<T const&>(rhs.value.GetRef()));
-            }
+        constexpr Val_Option(Val_Option<U> const& rhs) {
+            ConstructFrom(rhs);
         }
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
-        constexpr Val_Option(Val_Option<U>&& rhs) : present{rhs.present} {
-            if(present) {
-                value.Emplace(static_cast<T&&>(rhs.value.GetRef()));
-            }
+        constexpr Val_Option(Val_Option<U>&& rhs) {
+            ConstructFrom(std::move(rhs));
         }
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
-        constexpr Val_Option(Val_Option<U>& rhs)
-            : Val_Option{const_cast<Val_Option<U> const&>(rhs)} {}
+        constexpr Val_Option(Val_Option<U>& rhs) {
+            ConstructFrom(rhs);
+        }
 
         template<typename ... ARGS>
         constexpr Val_Option(ARGS&& ... args)
@@ -54,28 +66,22 @@ namespace detail::base {
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         auto operator=(Val_Option<U> const& rhs) -> Val_Option& {
-            if constexpr(!std::is_trivially_destructible_v<T>) {
-                Destroy();
-            }
-
-            present = rhs.present;
-            if(present) value.Emplace(static_cast<T const&>(rhs.value.GetRef()));
-
+            Destroy();
+            ConstructFrom(rhs);
             return *this;
         }
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         auto operator=(Val_Option<U>&& rhs) -> Val_Option& {
-            if constexpr(!std::is_trivially_destructible_v<T>) {
-                Destroy();
-            }
-
-            present = rhs.present;
-            if(present) {
-                value.Emplace(static_cast<T&&>(rhs.value.GetRef()));
-            }
-
+            Destroy();
+            ConstructFrom(std::move(rhs));
             return *this;
+        }
+
+        template<typename ... ARGS>
+        auto Emplace(ARGS&& ... args) -> auto {
+            Destroy();
+            return Construct(std::forward<ARGS>(args)...);
         }
 
         constexpr auto Present() const -> bool {
@@ -133,18 +139,9 @@ namespace detail::base {
             return present ?  std::move(Value()) : std::move(defaultValue);
         }
 
-        template<typename ... ARGS>
-        auto Emplace(ARGS&& ... args) -> auto {
-            if constexpr(!std::is_trivially_destructible_v<T>) {
-                Destroy();
-            }
-            present = true;
-            return value.Emplace(std::forward<ARGS...>(args)...);
-        }
-
     protected:
         Val_Placement<T> value;
-        bool present;
+        bool present{false};
     };
 }
 
