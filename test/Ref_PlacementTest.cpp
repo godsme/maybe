@@ -20,3 +20,35 @@ SCENARIO("Ref Placement Test") {
     REQUIRE(*int_ref == b);
     REQUIRE(int_ref.GetRef() == b);
 }
+
+namespace {
+    struct Base {
+        Base(int a) : a{a} {}
+        int a;
+        virtual ~Base() = default;
+    };
+
+    struct Derived : Base {
+        Derived(int a, int b) : Base(a), b{b} {}
+        int b;
+    };
+}
+
+SCENARIO("Ref class Placement Test") {
+    Derived derived{10, 20};
+    Ref_Placement<Derived>  ref_derived{derived};
+
+    REQUIRE(ref_derived);
+    REQUIRE(ref_derived->a == 10);
+    REQUIRE(ref_derived->b == 20);
+
+    Ref_Placement<Base> ref_base{ref_derived};
+
+    REQUIRE(ref_base);
+    REQUIRE(ref_base->a == 10);
+
+    ref_base = ref_derived;
+
+    REQUIRE(ref_base);
+    REQUIRE(ref_base->a == 10);
+}

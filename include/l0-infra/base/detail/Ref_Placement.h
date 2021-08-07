@@ -5,23 +5,31 @@
 #ifndef PLACEMENT_C5A827A5E70E4D0396C1AC85D28DFC41
 #define PLACEMENT_C5A827A5E70E4D0396C1AC85D28DFC41
 
+#include <type_traits>
+
 template<typename T>
 struct Ref_Placement {
     constexpr Ref_Placement() : pointer{nullptr} {}
-    constexpr explicit Ref_Placement(Ref_Placement const& rhs) : pointer{rhs.pointer} {}
-    constexpr explicit Ref_Placement(T& v) : pointer{&v} {}
+
+    template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
+    constexpr explicit Ref_Placement(Ref_Placement<U> const& rhs)
+        : pointer{static_cast<T*>(rhs.pointer)} {}
+
+    template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
+    constexpr explicit Ref_Placement(U& v) : pointer{std::addressof(static_cast<T&>(v))} {}
 
     explicit constexpr operator bool() const {
         return pointer != 0;
     }
 
     auto Emplace(T& v) -> T& {
-        pointer = &v;
+        pointer = std::addressof(v);
         return *pointer;
     }
 
-    auto operator=(Ref_Placement const& rhs) -> Ref_Placement& {
-        pointer = rhs.pointer;
+    template<typename U, typename = std::enable_if_t<std::is_convertible_v<U*, T*>>>
+    auto operator=(Ref_Placement<U> const& rhs) -> Ref_Placement& {
+        pointer = static_cast<T*>(rhs.pointer);
         return *this;
     }
 
@@ -54,6 +62,10 @@ struct Ref_Placement {
     auto operator*() -> T& {
         return GetRef();
     }
+
+private:
+    template<typename U>
+    friend struct Ref_Placement;
 
 private:
     T* pointer;

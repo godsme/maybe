@@ -32,7 +32,6 @@ private:
     using Parent = detail::Option<T>;
     using ValueType = std::remove_reference_t<T>;
 
-private:
     template<typename C>
     struct Unwrap {
         using Type = C;
