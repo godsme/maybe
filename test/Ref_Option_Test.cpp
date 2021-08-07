@@ -29,13 +29,17 @@ namespace {
     };
 
     static_assert(!std::is_copy_constructible_v<Foo>);
+
+    struct Bar : Foo {
+        using Foo::Foo;
+    };
 }
 
 SCENARIO("Ref Option Test") {
     Option<Foo&> maybe;
     static_assert(sizeof(Option<Foo&>) == sizeof(void*));
     static_assert(std::is_trivially_destructible_v<Option<Foo&>>);
-    static_assert(!std::is_trivially_copyable_v<Option<Foo&>>);
+    static_assert(std::is_trivially_copyable_v<Option<Foo&>>);
     REQUIRE(!maybe.Present());
     REQUIRE(maybe == std::nullopt);
     REQUIRE(maybe == Option<Foo&>{});
@@ -54,8 +58,15 @@ SCENARIO("Ref cons by Nothing Test") {
 }
 
 SCENARIO("Ref cons by value Option Test") {
-    Foo a{10, 20};
+    Bar a{10, 20};
+    Option<Bar&> maybe_bar{a};
     Option<Foo&> maybe{a};
+    REQUIRE(maybe.Present());
+    REQUIRE(maybe != std::nullopt);
+    REQUIRE(*maybe == Foo{10, 20});
+
+    maybe = maybe_bar;
+
     REQUIRE(maybe.Present());
     REQUIRE(maybe != std::nullopt);
     REQUIRE(*maybe == Foo{10, 20});
@@ -64,9 +75,10 @@ SCENARIO("Ref cons by value Option Test") {
 SCENARIO("Ref Foo cons by another Option Test") {
     constructed = 0;
     {
-        Foo a{10, 20};
+        Bar a{10, 20};
         REQUIRE(constructed == 1);
-        Option<Foo&> maybe1{a};
+        Option<Bar&> maybe_bar{a};
+        Option<Foo&> maybe1{maybe_bar};
         Option<Foo&> maybe{std::move(maybe1)};
 
         REQUIRE(constructed == 1);

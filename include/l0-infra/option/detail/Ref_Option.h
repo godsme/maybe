@@ -15,13 +15,13 @@ namespace detail {
 
         constexpr Ref_Option() {}
         constexpr Ref_Option(std::nullopt_t) {}
-        constexpr Ref_Option(Ref_Option<T> const& rhs) : value{rhs.value} {}
+        constexpr Ref_Option(Ref_Option const& rhs) = default;
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U&, T&>>>
         constexpr Ref_Option(Ref_Option<U> const& rhs) : value{rhs.value} {}
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U&, T&>>>
-        constexpr Ref_Option(U& ref) : value{static_cast<T&>(ref)} {}
+        constexpr Ref_Option(U& ref) : value{ref} {}
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U&, T&>>>
         auto operator=(Ref_Option<U> const& rhs) -> Ref_Option& {
@@ -62,6 +62,10 @@ namespace detail {
         }
 
         auto ValueOr(T&& defaultValue) const = delete;
+
+    private:
+        template<typename>
+        friend struct Ref_Option;
 
     private:
         Ref_Placement<T> value;
