@@ -43,6 +43,10 @@ namespace detail::base {
             ConstructFrom(rhs);
         }
 
+        constexpr Val_Option(Val_Option&& rhs) {
+            ConstructFrom(std::move(rhs));
+        }
+
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         constexpr Val_Option(Val_Option<U> const& rhs) {
             ConstructFrom(rhs);
@@ -132,6 +136,11 @@ namespace detail::base {
             } else {
                 return std::move(defaultValue);
             }
+        }
+
+        constexpr auto ValueOr(T&& defaultValue) const && -> T {
+            static_assert(std::is_move_assignable_v<T>);
+            return present ?  std::move(Value()) : std::move(defaultValue);
         }
 
         constexpr auto ValueOr(T&& defaultValue) && -> T {
