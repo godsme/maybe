@@ -64,6 +64,10 @@ public:
         return Parent::Value();
     }
 
+    auto operator->() -> auto* {
+        return &Parent::Value();
+    }
+
     constexpr explicit operator bool() const {
         return Parent::Present();
     }

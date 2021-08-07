@@ -11,12 +11,12 @@ SCENARIO("Ref Placement Test") {
     int_ref.Emplace(a);
     REQUIRE(*int_ref == a);
 
-    REQUIRE(int_ref.GetObj() == &a);
+    REQUIRE(int_ref.GetRef() == a);
 
     int b = 20;
 
     int_ref.Replace(b);
 
     REQUIRE(*int_ref == b);
-    REQUIRE(int_ref.GetObj() == &b);
+    REQUIRE(int_ref.GetRef() == b);
 }

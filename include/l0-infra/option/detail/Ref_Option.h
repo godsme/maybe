@@ -35,15 +35,27 @@ namespace detail {
             return value.GetRef();
         }
 
-        auto Emplace(T& ref) -> auto {
+        auto Emplace(T& ref) -> decltype(auto) {
             return value.Emplace(ref);
         }
 
-        constexpr auto ValueOr(T& defaultValue) const -> T& {
+        constexpr auto ValueOr(T& defaultValue) const -> T const& {
             return Present() ?  Value() : defaultValue;
         }
 
-        constexpr auto ValueOr(T&& defaultValue) const = delete;
+        constexpr auto ValueOr(T const& defaultValue) const -> T const& {
+            return Present() ?  Value() : defaultValue;
+        }
+
+        auto ValueOr(T& defaultValue) -> T& {
+            return Present() ?  Value() : defaultValue;
+        }
+
+        auto ValueOr(T const& defaultValue) -> T const& {
+            return Present() ?  Value() : defaultValue;
+        }
+
+        auto ValueOr(T&& defaultValue) const = delete;
 
     private:
         Ref_Placement<T> value;
