@@ -20,7 +20,6 @@ namespace detail::base {
                     value.Destroy();
                 }
             }
-            present = false;
         }
 
         template<typename ... ARGS>
@@ -33,6 +32,15 @@ namespace detail::base {
         auto ConstructFrom(THAT&& that) -> void {
             if(that.Present()) {
                 Construct(std::forward<THAT>(that).Value());
+            }
+        }
+
+        template<typename THAT>
+        auto AssignFrom(THAT&& that) -> void {
+            if(that.Present()) {
+                Construct(std::forward<THAT>(that).Value());
+            } else {
+                present = false;
             }
         }
 
@@ -70,27 +78,27 @@ namespace detail::base {
 
         auto operator=(Val_Option const& rhs) -> Val_Option& {
             Destroy();
-            ConstructFrom(rhs);
+            AssignFrom(rhs);
             return *this;
         }
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         auto operator=(Val_Option<U> const& rhs) -> Val_Option& {
             Destroy();
-            ConstructFrom(rhs);
+            AssignFrom(rhs);
             return *this;
         }
 
         auto operator=(Val_Option&& rhs) -> Val_Option& {
             Destroy();
-            ConstructFrom(std::move(rhs));
+            AssignFrom(std::move(rhs));
             return *this;
         }
 
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         auto operator=(Val_Option<U>&& rhs) -> Val_Option& {
             Destroy();
-            ConstructFrom(std::move(rhs));
+            AssignFrom(std::move(rhs));
             return *this;
         }
 
