@@ -18,9 +18,9 @@ namespace detail::base {
             if constexpr(!std::is_trivially_destructible_v<T>) {
                 if(present) {
                     value.Destroy();
-                    present = false;
                 }
             }
+            present = false;
         }
 
         template<typename ... ARGS>
@@ -68,10 +68,22 @@ namespace detail::base {
             , value{std::in_place, std::forward<ARGS>(args)...} {
         }
 
+        auto operator=(Val_Option const& rhs) -> Val_Option& {
+            Destroy();
+            ConstructFrom(rhs);
+            return *this;
+        }
+
         template<typename U, typename = std::enable_if_t<std::is_convertible_v<U, T>>>
         auto operator=(Val_Option<U> const& rhs) -> Val_Option& {
             Destroy();
             ConstructFrom(rhs);
+            return *this;
+        }
+
+        auto operator=(Val_Option&& rhs) -> Val_Option& {
+            Destroy();
+            ConstructFrom(std::move(rhs));
             return *this;
         }
 
